@@ -104,7 +104,12 @@ public class JMF extends Thread {
                 System.exit(1);
             }
             System.out.println("-> Set the data source on the transmitter");
-            transmitter.startTransmition();
+            try {
+                transmitter.startTransmition();
+            } catch (IOException ex) {
+                System.out.println("[] ERROR: " + ex);
+                System.exit(1);
+            }
             System.out.println("-> Transmitting...");
             System.out.println("   Press the Enter key to exit");
             try {
@@ -115,7 +120,12 @@ public class JMF extends Thread {
                 System.exit(1);
             }
             System.out.println("-> Exiting");
-            transmitter.stopTransmition();
+            try {
+                transmitter.stopTransmition();
+            } catch (IOException ex) {
+                System.out.println("[] ERROR: " + ex);
+                System.exit(1);
+            }
         }
 
     }

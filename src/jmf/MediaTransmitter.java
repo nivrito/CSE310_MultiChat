@@ -14,159 +14,74 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package jmf;
 
+import javax.media.*;
+import javax.media.control.*;
+import javax.media.protocol.*;
+import javax.media.format.*;
+
+import java.io.IOException;
+import java.io.File;
+
 /**
- * This class enables received media to be played via a Player.
- * Uses JMF.
+ * This class transmits media data in RTP audio format to a destination.
  *
  * @author Nivrito
  * @version 1.00
  */
-
-import javax.media.*;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-
-import java.io.*;
-
-public class MediaPlayerFrame extends JFrame {
-
-    private static final String MEDIAFRAME_TITLE = "Recieveing . .";
-    private static final String CONTROLFRAME_TITLE = "Controls";
-    private static final int XPOSITION = 100;
-    private static final int YPOSITION = 100;
-    private static final int FRAMEHEIGHT = 500;
-    private static final int FRAMEWIDTH = 500;
-    private Player player = null;
-    private JTabbedPane tabPane = null;
+public class MediaTransmitter {
+    private MediaLocator mediaLoc = null;
+    private DataSink Data_Sink = null;
+    private Processor Media_Proc = null;
+    private static final Format[] DATA_FORMATS = new Format[]{new AudioFormat(AudioFormat.GSM_RTP)};
+    private static final ContentDescriptor CONTENT_DESCRIPTOR = new ContentDescriptor(ContentDescriptor.RAW_RTP);
     
     
     /**
-     * This constructor sets up basic structure for the media player.
+     * General constructor, uses media locator to locate source.
+     * @param locator MediaLocator for source.
      */
-    public MediaPlayerFrame() {
-        super(MEDIAFRAME_TITLE);
-        setLocation(XPOSITION, YPOSITION);
-        setSize(FRAMEWIDTH, FRAMEHEIGHT);
-        tabPane = new JTabbedPane();
-        getContentPane().add(tabPane);
-        addWindowListener(new WindowAdapter() {
-            
-            /**
-             * This method enables the player window to be closed when crossed out.
-             * @param e WindowEvent monitoring the close button.  
-             */
-            @Override
-            public void windowClosing(WindowEvent e) {
-                currentPlayerClose();
-                System.exit(0);
-            }
-        });
-    }
-    
-    
-    /**
-     * Creates main panel UI.
-     * @return returns a set upped JPanel. With all components and controls.
-     */
-    private JPanel mainPanelInitialize() {
-        JPanel mainPanel = new JPanel();
-        GridBagLayout gbl = new GridBagLayout();
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        mainPanel.setLayout(gbl);
-
-        boolean visComp = false;
-
-        if (player.getVisualComponent() != null) {
-            visComp = true;
-
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.weightx = 1;
-            gbc.weighty = 1;
-            gbc.fill = GridBagConstraints.BOTH;
-
-            mainPanel.add(player.getVisualComponent(), gbc);
-        }
-
-        if ((player.getGainControl() != null) && (player.getGainControl().getControlComponent() != null)) {
-            gbc.gridx = 1;
-            gbc.gridy = 0;
-            gbc.weightx = 0;
-            gbc.weighty = 1;
-            gbc.gridheight = 2;
-            gbc.fill = GridBagConstraints.VERTICAL;
-            mainPanel.add(player.getGainControl().getControlComponent(), gbc);
-
-        }
-
-        if (player.getControlPanelComponent() != null) {
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            gbc.weightx = 1;
-            gbc.gridheight = 1;
-
-            if (visComp) {
-                gbc.fill = GridBagConstraints.HORIZONTAL;
-                gbc.weighty = 0;
-            } else {
-                gbc.fill = GridBagConstraints.BOTH;
-                gbc.weighty = 1;
-            }
-            mainPanel.add(player.getControlPanelComponent(), gbc);
-        }
-
-        return mainPanel;
+    public MediaTransmitter(MediaLocator locator) {
+        mediaLoc = locator;
     }
     
     /**
-     * Sets MediaLocator to locate source of the playable media.
-     * @param locator MediaLocator for the media.
+     * Starts transmission
+     * @throws IOException 
+     */
+    public void startTransmition() throws IOException {
+        Media_Proc.start();;
+        Data_Sink.open();
+        Data_Sink.start();
+    }
+    
+    /**
+     * Stops transmission
+     * @throws IOException 
+     */
+    public void stopTransmition() throws IOException  {
+        Data_Sink.stop();
+        Data_Sink.close();
+        Media_Proc.stop();
+        Media_Proc.close();
+    }
+    
+    /**
+     * Sets data sink for the transmission using a data source.
+     * @param ds DataSource parameter
      * @throws IOException
-     * @throws NoPlayerException
-     * @throws CannotRealizeException 
+     * @throws NoProcessorException
+     * @throws CannotRealizeException
+     * @throws NoDataSinkException 
      */
-    public void mediaLocatorSetup(MediaLocator locator) throws IOException, NoPlayerException, CannotRealizeException {
-        PlayerSetup(Manager.createRealizedPlayer(locator));
+    public void dataSourceSetup(DataSource ds) throws IOException, NoProcessorException, CannotRealizeException, NoDataSinkException  {
+        Media_Proc = Manager.createRealizedProcessor(new ProcessorModel(ds, DATA_FORMATS, CONTENT_DESCRIPTOR));
+        Data_Sink = Manager.createDataSink(Media_Proc.getDataOutput(), mediaLoc);
+        
     }
     
-    /**
-     * Sets up a given player to enable it for playing media. Closes all the existing players.
-     * @param pl Player object to play the media.
-     */
-    private void PlayerSetup(Player pl) {
-        currentPlayerClose();
-        player = pl;
-
-        tabPane.removeAll();
-
-        if (player == null) {
-            return;
-        }
-
-        tabPane.add(CONTROLFRAME_TITLE, mainPanelInitialize());
-
-        Control[] controls = player.getControls();
-        for (int i = 0; i < controls.length; i++) {
-            if (controls[i].getControlComponent() != null) {
-                tabPane.add(controls[i].getControlComponent());
-            }
-        }
-    }
-
     
-    /**
-     * Closes current player.
-     */
-    private void currentPlayerClose() {
-        if (player != null) {
-            player.stop();
-            player.close();
-        }
-    }
     
 }
