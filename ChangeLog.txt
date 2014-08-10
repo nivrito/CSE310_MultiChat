@@ -1,0 +1,14 @@
+•	Milestone 1: Pre Alpha – Concept Skeleton and Project Outline
+o	Submitted on:  10/07/14
+•	Milestone 2: Alpha – Concept outlines, project details
+o	Submitted on:  16/07/14
+•	Milestone 3: Beta – Second Attempt on the Audio Chat core part. Text Chat course system classes. All untested.
+o	Submitted on: 23/07/14
+•	Milestone 4: Release Candidate – Working Audio Chat system, deprecation of Video Chat from the project.
+o	PRESENTED IN CLASS on 5/8/2014
+o	Submitted on 11/08/2014
+•	Milestone 5: Release – Working Audio Chat with command line initialization and Player Frame GUI. Unresponsive Program GUI.
+o	PRESENTED IN CLASS on 7/8/2014
+o	Submitted on 11/08/2014
+•	Milestone 6: Final – Command line initialization improvement. Javadoc included. Project report and Change log included.
+o	Submitted on 11/08/2014
